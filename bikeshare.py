@@ -157,19 +157,43 @@ def trip_duration_stats(df):
         df (pandas.DataFrame): Bikeshare data
 
     Prints:
-        - Total travel time
-        - Mean travel time
+        - Total travel time (in days, hours, minutes)
+        - Mean travel time (in minutes)
+        - Median travel time (in minutes)
+        - Trip duration distribution summary
+        - 90th percentile trip duration
     """
     print('\nCalculating Trip Duration...\n')
     start_time = time.time()
 
-    # display total travel time
-    total_travel = df['Trip Duration'].sum()
-    print('Total travel time:', total_travel)
+    # Calculate total travel time and convert to days, hours, minutes
+    total_seconds = df['Trip Duration'].sum()
+    days = total_seconds // (24 * 3600)
+    remaining = total_seconds % (24 * 3600)
+    hours = remaining // 3600
+    minutes = (remaining % 3600) // 60
+    
+    print(f'Total travel time: {int(days)} days, {int(hours)} hours, {int(minutes)} minutes')
 
-    # display mean travel time
-    mean_travel = df['Trip Duration'].mean()
-    print('Mean travel time:', mean_travel)
+    # Calculate and display various duration statistics
+    mean_mins = df['Trip Duration'].mean() / 60
+    median_mins = df['Trip Duration'].median() / 60
+    percentile_90 = df['Trip Duration'].quantile(0.9) / 60
+    
+    print(f'Mean travel time: {mean_mins:.1f} minutes')
+    print(f'Median travel time: {median_mins:.1f} minutes')
+    print(f'90% of trips are shorter than: {percentile_90:.1f} minutes')
+
+    # Display trip duration distribution
+    print('\nTrip Duration Distribution:')
+    duration_bins = [0, 10, 20, 30, 60, float('inf')]
+    labels = ['0-10 mins', '10-20 mins', '20-30 mins', '30-60 mins', '60+ mins']
+    df['duration_category'] = pd.cut(df['Trip Duration'] / 60, bins=duration_bins, labels=labels)
+    distribution = df['duration_category'].value_counts().sort_index()
+    
+    for category, count in distribution.items():
+        percentage = (count / len(df)) * 100
+        print(f'{category}: {count} trips ({percentage:.1f}%)')
 
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
