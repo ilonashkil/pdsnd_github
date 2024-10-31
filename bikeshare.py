@@ -1,0 +1,226 @@
+import time
+import pandas as pd
+import numpy as np
+
+CITY_DATA = { 'chicago': 'chicago.csv',
+              'new york city': 'new_york_city.csv',
+              'washington': 'washington.csv' }
+
+def get_filters():
+    """
+    Asks user to specify a city, month, and day to analyze.
+    """
+    MONTHS = ['all', 'january', 'february', 'march', 'april', 'may', 'june']
+    DAYS = ['all', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+    
+    print('Hello! Let\'s explore some US bikeshare data!')
+    
+    def get_valid_input(prompt, valid_options):
+        while True:
+            response = input(prompt).lower()
+            if response in valid_options:
+                return response
+            print(f'Invalid input. Please enter one of: {", ".join(valid_options)}.')
+    
+    city = get_valid_input(
+        'Would you like to see data for Chicago, New York City, or Washington?\n',
+        CITY_DATA.keys()
+    )
+    
+    month = get_valid_input(
+        'Which month? January, February, March, April, May, June or "all"?\n',
+        MONTHS
+    )
+    
+    day = get_valid_input(
+        'Which day? Please type a day of the week or "all".\n',
+        DAYS
+    )
+
+    print('-'*40)
+    return city, month, day
+
+def load_data(city, month, day):
+    """
+    Loads data for the specified city and filters by month and day if applicable.
+    """
+    df = pd.read_csv(CITY_DATA[city])
+    
+    df['Start Time'] = pd.to_datetime(df['Start Time'])
+    
+    df['month'] = df['Start Time'].dt.month
+    df['day_of_week'] = df['Start Time'].dt.day_name().str.lower()
+    df['hour'] = df['Start Time'].dt.hour
+    
+    if month != 'all':
+        months = ['january', 'february', 'march', 'april', 'may', 'june']
+        month = months.index(month) + 1
+        df = df[df['month'] == month]
+    
+    if day != 'all':
+        df = df[df['day_of_week'] == day]
+    
+    return df
+
+def time_stats(df):
+    """Displays statistics on the most frequent times of travel."""
+
+    print('\nCalculating The Most Frequent Times of Travel...\n')
+    start_time = time.time()
+    # display the most common month
+    common_month = df['month'].mode()[0]
+    print('Most common month:', common_month)
+
+    # display the most common day of week  
+    common_day = df['day_of_week'].mode()[0]
+    print('Most common day of week:', common_day)
+
+    # display the most common start hour
+    common_hour = df['hour'].mode()[0]
+    print('Most common start hour:', common_hour)
+
+
+    print("\nThis took %s seconds." % (time.time() - start_time))
+    print('-'*40)
+
+
+def station_stats(df):
+    """Displays statistics on the most popular stations and trip."""
+
+    print('\nCalculating The Most Popular Stations and Trip...\n')
+    start_time = time.time()
+
+    # display most commonly used start station
+    common_start = df['Start Station'].mode()[0]
+    print('Most common start station:', common_start)
+
+    # display most commonly used end station
+    common_end = df['End Station'].mode()[0]
+    print('Most common end station:', common_end)
+
+    # display most frequent combination of start station and end station trip
+    df['Station Combo'] = df['Start Station'] + ' to ' + df['End Station']
+    common_combo = df['Station Combo'].mode()[0]
+    print('Most common station combination:', common_combo)
+
+
+
+    print("\nThis took %s seconds." % (time.time() - start_time))
+    print('-'*40)
+
+
+def trip_duration_stats(df):
+    """Displays statistics on the total and average trip duration."""
+
+    print('\nCalculating Trip Duration...\n')
+    start_time = time.time()
+
+    # display total travel time
+    total_travel = df['Trip Duration'].sum()
+    print('Total travel time:', total_travel)
+
+    # display mean travel time
+    mean_travel = df['Trip Duration'].mean()
+    print('Mean travel time:', mean_travel)
+
+    print("\nThis took %s seconds." % (time.time() - start_time))
+    print('-'*40)
+
+
+def user_stats(df):
+    """Displays statistics on bikeshare users."""
+
+    print('\nCalculating User Stats...\n')
+    start_time = time.time()
+
+    # Display counts of user types 
+    user_types = df['User Type'].value_counts()
+    print('Counts of user types:\n', user_types)
+
+
+    # Display counts of gender
+    if 'Gender' in df.columns:
+        gender_counts = df['Gender'].value_counts()
+        print('Counts of gender:\n', gender_counts)
+    else:
+        print('Gender data not available for this city.')
+
+
+    # Display earliest, most recent, and most common year of birth
+    if 'Birth Year' in df.columns:
+        earliest_birth = df['Birth Year'].min()
+        most_recent_birth = df['Birth Year'].max()
+        most_common_birth = df['Birth Year'].mode()[0]
+        print('Earliest birth year:', earliest_birth)
+        print('Most recent birth year:', most_recent_birth)
+        print('Most common birth year:', most_common_birth)
+    else:
+        print('Birth year data not available for this city.')
+
+
+    print("\nThis took %s seconds." % (time.time() - start_time))
+    print('-'*40)
+
+def additional_stats(df):
+    """Displays additional interesting statistics about the bikeshare data."""
+    
+    print('\nCalculating Additional Statistics...\n')
+    start_time = time.time()
+
+    # Calculate rush hour statistics
+    print('Rush Hour Analysis:')
+    morning_rush = df[df['hour'].between(7, 9)]['hour'].count()
+    evening_rush = df[df['hour'].between(16, 18)]['hour'].count()
+    print(f'Morning rush hour (7-9 AM) trips: {morning_rush}')
+    print(f'Evening rush hour (4-6 PM) trips: {evening_rush}')
+
+    # Calculate average trip duration by user type
+    print('\nAverage Trip Duration by User Type:')
+    avg_duration = df.groupby('User Type')['Trip Duration'].mean().round(2)
+    print(avg_duration)
+
+    # Find the longest and shortest trips
+    longest_trip = df['Trip Duration'].max() / 60  # Convert to minutes
+    shortest_trip = df['Trip Duration'].min() / 60
+    print(f'\nLongest trip: {longest_trip:.2f} minutes')
+    print(f'Shortest trip: {shortest_trip:.2f} minutes')
+
+    # Calculate weekend vs weekday usage
+    df['is_weekend'] = df['day_of_week'].isin(['saturday', 'sunday'])
+    weekend_trips = df[df['is_weekend']]['Start Time'].count()
+    weekday_trips = df[~df['is_weekend']]['Start Time'].count()
+    print(f'\nWeekend trips: {weekend_trips}')
+    print(f'Weekday trips: {weekday_trips}')
+
+    # Find most popular routes during different times of day
+    df['time_of_day'] = pd.cut(df['hour'], 
+                              bins=[0, 6, 12, 18, 24], 
+                              labels=['Night', 'Morning', 'Afternoon', 'Evening'])
+    
+    print('\nMost Popular Routes by Time of Day:')
+    for time_period in ['Morning', 'Afternoon', 'Evening', 'Night']:
+        popular_route = df[df['time_of_day'] == time_period]['Station Combo'].mode().iloc[0]
+        print(f'{time_period}: {popular_route}')
+
+    print("\nThis took %s seconds." % (time.time() - start_time))
+    print('-'*40)
+
+def main():
+    while True:
+        city, month, day = get_filters()
+        df = load_data(city, month, day)
+
+        time_stats(df)
+        station_stats(df)
+        trip_duration_stats(df)
+        user_stats(df)
+        additional_stats(df)
+
+        restart = input('\nWould you like to restart? Enter yes or no.\n')
+        if restart.lower() != 'yes':
+            break
+
+
+if __name__ == "__main__":
+	main()
+
