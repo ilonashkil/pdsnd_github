@@ -1,5 +1,5 @@
 ### Date created
-October 31, 2024
+Include the date you created this project and README file.
 
 ### Project Title
 US Bikeshare Data Analysis
@@ -14,16 +14,17 @@ This Python project analyzes bike share data from three major US cities: Chicago
 
 ### Files used
 - bikeshare.py: Main Python script containing the analysis code
-- bikeshare_2.py: Updated version of the analysis script
+- bikeshare_2.py: Updated version of the analysis script with improved error handling
 - .gitignore: Specifies which files Git should ignore
 - Data files (not included in repo):
-  - chicago.csv
-  - new_york_city.csv
-  - washington.csv
+  - chicago.csv: Contains Chicago bikeshare data
+  - new_york_city.csv: Contains NYC bikeshare data
+  - washington.csv: Contains Washington DC bikeshare data
 
 ### Credits
 - Data provided by [Motivate](https://www.motivateco.com/)
 - Project completed as part of Udacity's Programming for Data Science with Python Nanodegree
 - [Pandas Documentation](https://pandas.pydata.org/docs/)
 - [Python Documentation](https://docs.python.org/3/)
+- [NumPy Documentation](https://numpy.org/doc/)
 
