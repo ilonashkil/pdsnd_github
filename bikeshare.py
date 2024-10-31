@@ -9,6 +9,17 @@ CITY_DATA = { 'chicago': 'chicago.csv',
 def get_filters():
     """
     Asks user to specify a city, month, and day to analyze.
+
+    Prompts the user to input:
+    1. A city (Chicago, New York City, or Washington)
+    2. A month (January through June, or "all")
+    3. A day of the week (or "all")
+
+    Returns:
+        tuple: (city, month, day)
+            city (str): Name of the city to analyze
+            month (str): Name of the month to filter by, or "all"
+            day (str): Name of the day of week to filter by, or "all"
     """
     MONTHS = ['all', 'january', 'february', 'march', 'april', 'may', 'june']
     DAYS = ['all', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
@@ -43,6 +54,17 @@ def get_filters():
 def load_data(city, month, day):
     """
     Loads data for the specified city and filters by month and day if applicable.
+
+    Args:
+        city (str): Name of the city to analyze
+        month (str): Name of the month to filter by, or "all"
+        day (str): Name of the day of week to filter by, or "all"
+
+    Returns:
+        pandas.DataFrame: Contains the filtered bikeshare data with additional columns:
+            - 'month': Extracted month from Start Time
+            - 'day_of_week': Extracted day name from Start Time
+            - 'hour': Extracted hour from Start Time
     """
     df = pd.read_csv(CITY_DATA[city])
     
@@ -63,8 +85,17 @@ def load_data(city, month, day):
     return df
 
 def time_stats(df):
-    """Displays statistics on the most frequent times of travel."""
+    """
+    Displays statistics on the most frequent times of travel.
 
+    Args:
+        df (pandas.DataFrame): Bikeshare data
+
+    Prints:
+        - Most common month
+        - Most common day of week
+        - Most common start hour
+    """
     print('\nCalculating The Most Frequent Times of Travel...\n')
     start_time = time.time()
     # display the most common month
@@ -85,8 +116,17 @@ def time_stats(df):
 
 
 def station_stats(df):
-    """Displays statistics on the most popular stations and trip."""
+    """
+    Displays statistics on the most popular stations and trip.
 
+    Args:
+        df (pandas.DataFrame): Bikeshare data
+
+    Prints:
+        - Most commonly used start station
+        - Most commonly used end station
+        - Most frequent combination of start and end stations
+    """
     print('\nCalculating The Most Popular Stations and Trip...\n')
     start_time = time.time()
 
@@ -110,8 +150,16 @@ def station_stats(df):
 
 
 def trip_duration_stats(df):
-    """Displays statistics on the total and average trip duration."""
+    """
+    Displays statistics on the total and average trip duration.
 
+    Args:
+        df (pandas.DataFrame): Bikeshare data
+
+    Prints:
+        - Total travel time
+        - Mean travel time
+    """
     print('\nCalculating Trip Duration...\n')
     start_time = time.time()
 
@@ -128,8 +176,17 @@ def trip_duration_stats(df):
 
 
 def user_stats(df):
-    """Displays statistics on bikeshare users."""
+    """
+    Displays statistics on bikeshare users.
 
+    Args:
+        df (pandas.DataFrame): Bikeshare data
+
+    Prints:
+        - Counts of user types
+        - Counts of gender (if available)
+        - Earliest, most recent, and most common birth year (if available)
+    """
     print('\nCalculating User Stats...\n')
     start_time = time.time()
 
@@ -162,8 +219,19 @@ def user_stats(df):
     print('-'*40)
 
 def additional_stats(df):
-    """Displays additional interesting statistics about the bikeshare data."""
-    
+    """
+    Displays additional interesting statistics about the bikeshare data.
+
+    Args:
+        df (pandas.DataFrame): Bikeshare data
+
+    Prints:
+        - Rush hour analysis (morning and evening trip counts)
+        - Average trip duration by user type
+        - Longest and shortest trip durations
+        - Weekend vs weekday usage statistics
+        - Most popular routes by time of day (Morning, Afternoon, Evening, Night)
+    """
     print('\nCalculating Additional Statistics...\n')
     start_time = time.time()
 
@@ -206,6 +274,16 @@ def additional_stats(df):
     print('-'*40)
 
 def main():
+    """
+    Main function to run the bikeshare data analysis program.
+    
+    Continuously prompts user for input to analyze bikeshare data
+    until the user chooses to exit. For each iteration:
+    1. Gets filter preferences from user
+    2. Loads and filters the data
+    3. Displays various statistical analyses
+    4. Asks if user wants to restart
+    """
     while True:
         city, month, day = get_filters()
         df = load_data(city, month, day)
